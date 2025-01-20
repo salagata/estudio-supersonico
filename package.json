@@ -1,0 +1,15 @@
+{
+  "name": "estudio-supersonico",
+  "version": "1.0.0",
+  "description": "Estudia como los supersonicos con gemini",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "salagata",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "express": "^4.21.2"
+  }
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Examenes</title>
+</head>
+<body>
+    <div id="data">
+        <h2>Temario:</h2>
+        <textarea name="questions" id="questions" required></textarea>
+        <br>
+        <h2>Informacion Adicional:</h2>
+        <textarea name="extras" id="extras"></textarea>
+        <br>
+        <button id="submit">Generar</button>
+        <p id="load"></p>
+    </div>
+    <ol id="exam">
+    </ol>
+    <script>
+        document.getElementById('submit').addEventListener('click', function(e){
+            document.getElementById('load') = "Generando Examen...";
+            var questions = document.getElementById('questions').value;
+            var extras = document.getElementById('extras').value;
+            var data = {
+                questions: questions,
+                extras: extras
+            };
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/exam', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState == 4 && xhr.status == 200){
+                    document.getElementById('load') = "";
+                    var response = JSON.parse(xhr.responseText);
+                    var exam = document.getElementById('exam');
+                    var id = 0
+                    for (const question of response) {
+                        var li = document.createElement('li');
+                        switch(question.type) {
+                            case "D":
+                                const h2 = document.createElement('h2');
+                                h2.textContent = question.name;
+                                li.appendChild(h2);
+                                for (const que of question.questions) {
+                                    var ol = document.createElement('ol');
+                                    var li2 = document.createElement('li');
+                                    var h3 = document.createElement('h3');
+                                    h3.textContent = que.question;
+                                    var textarea = document.createElement('textarea');
+                                    li2.appendChild(h3);
+                                    li2.appendChild(textarea);
+                                    ol.appendChild(li2);
+                                    li.appendChild(ol);
+                                }
+                                break;
+                            case "C":
+                                const h22 = document.createElement('h2');
+                                h22.textContent = question.name;
+                                li.appendChild(h22);
+                                for (const que of question.questions) {
+                                    var ol = document.createElement('ol');
+                                    var li2 = document.createElement('li');
+                                    var h3 = document.createElement('h3');
+                                    h3.innerHTML = que.question.replaceAll('[_]','<input type="text">').replaceAll(/\_+/g,'<input type="text">');
+                                    li2.appendChild(h3);
+                                    ol.appendChild(li2);
+                                    li.appendChild(ol);
+                                }
+                                break;
+                            case "S":
+                                const h23 = document.createElement('h2');
+                                h23.textContent = question.name;
+                                li.appendChild(h23);
+                                for (const que of question.questions) {
+                                    var ol = document.createElement('ol');
+                                    var li2 = document.createElement('li');
+                                    var h3 = document.createElement('h3');
+                                    h3.textContent = que.question;
+                                    li2.appendChild(h3);
+                                    for (const option of que.options) {
+                                        var li3 = document.createElement('li');
+                                        var input = document.createElement('input');
+                                        input.setAttribute('type', 'radio');
+                                        input.setAttribute('name', String(id));
+                                        li3.appendChild(input);
+                                        li3.innerHTML += option;
+                                        li2.appendChild(li3);
+                                        id++
+                                    }
+                                    ol.appendChild(li2);
+                                    li.appendChild(ol);
+                                }
+                                break;
+                        }
+                        exam.appendChild(li);
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(data));
+        });
+    </script>
+</body>
+</html>
